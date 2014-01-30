@@ -8,6 +8,7 @@ DIV ON THE PAGE.
 Global variables
 **/
 var xLabel, yLabel;
+var xData, yData;
 
 /**
 This function is passed the variables to initially draw graph
@@ -47,12 +48,12 @@ function draw(){
 		
 	d3.csv("data/data.csv", function(error, data) {
 		data.forEach(function(d) {
-			d.kernelLength = +d[xLabel];
-			d.kernelWidth = +d[yLabel];
+			d.kernelLength = +d[xData];
+			d.kernelWidth = +d[yData];
 		});	
 		
-	    x.domain(d3.extent(data, function(d) { return d[xLabel]; })).nice();
-	    y.domain(d3.extent(data, function(d) { return d[yLabel]; })).nice();
+	    x.domain(d3.extent(data, function(d) { return d[xData]; })).nice();
+	    y.domain(d3.extent(data, function(d) { return d[yData]; })).nice();
 				
 		canvas.append("g")
 			.attr("class", "x axis")
@@ -81,8 +82,8 @@ function draw(){
 		    .enter().append("circle")
 		    .attr("class", "dot")
 		    .attr("r", 3.5)
-		    .attr("cx", function(d) { return x(d.kernelLength); })
-		    .attr("cy", function(d) { return y(d.kernelWidth); })
+		    .attr("cx", function(d) { return x(d[xData]); })
+		    .attr("cy", function(d) { return y(d[yData]); })
 		    .style("fill", function(d) { return color(d.variety); });
 			
 		 var legend = canvas.selectAll(".legend")
@@ -117,9 +118,32 @@ var text = function(d){
 This function is passed the variables to initially draw on the x and y axes.
 **/
 function init(xAxis, yAxis){
-	xLabel = xAxis;
-	yLabel = yAxis;
+		
+	xData = xAxis;
+	yData = yAxis;
+	
+	xLabel = toLabelString(xAxis);
+	yLabel = toLabelString(yAxis);
+	
 	draw();
+	
+}
+
+
+function toLabelString(value){
+	if (value == "compactness"){
+		return "Compactness";
+	} else if (value == "kernelLength"){
+		return "Kernel Lendth (cm)";
+	} else if (value == "kernelWidth"){
+		return "Kernel Width (cm)";
+	} else if (value == "asymmetryCoefficient"){
+		return "Asymmetry Coefficient";
+	}else if (value == "grooveLength"){
+		return "Groove Length (cm)";
+	} else {
+		return "none";
+	}
 	
 }
 
@@ -131,7 +155,8 @@ x axis changes. It is passed the variable name that has been selected, such as
 **/
 function onXAxisChange(value){
 	d3.select("svg").remove();
-	xLabel = value;
+	xData= value;
+	xLabel = toLabelString(value);
 	draw();
 }
 
@@ -144,7 +169,8 @@ accordingly.
 **/
 function onYAxisChange(value){
 	d3.select("svg").remove();
-	yLabel = value;
+	yData = value;
+	yLabel = toLabelString(value);
 	draw();
 }
 
