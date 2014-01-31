@@ -45,6 +45,12 @@ function draw(){
 				/**.style("background-color", "gray")**/
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+	// add the tooltip area to the webpage
+	var tooltip = d3.select('#details').append("div")
+		.attr("class", "tooltip")
+		.style("opacity", 0);
+	
 		
 	d3.csv("data/data.csv", function(error, data) {
 		data.forEach(function(d) {
@@ -84,7 +90,25 @@ function draw(){
 		    .attr("r", 3.5)
 		    .attr("cx", function(d) { return x(d[xData]); })
 		    .attr("cy", function(d) { return y(d[yData]); })
-		    .style("fill", function(d) { return color(d.variety); });
+		    .style("fill", function(d) { return color(d.variety); })
+	        .on("mouseover", function(d) {
+	            tooltip.transition()
+	                 .duration(200)
+	                 .style("opacity", .9);
+	            tooltip.html("Variety: " + d["variety"] +
+							"<br/> Compactness: " + d["compactness"] +
+							"<br/> Kernel Length: " + d["kernelLength"] + " cm" +
+							"<br/> Kernel Width: " + d["kernelWidth"] + " cm" +
+							"<br/> Asymmetry Coefficient: " + d["asymmetryCoefficient"] +
+							"<br/> Groove Length: " + d["grooveLength"] + " cm")
+	                 .style("left", d3.event.pageX + "px")
+	                 .style("top", d3.event.pageY + "px");
+	        })
+	        .on("mouseout", function(d) {
+	            tooltip.transition()
+	                 .duration(500)
+	                 .style("opacity", 0);
+	        });
 			
 		 var legend = canvas.selectAll(".legend")
 		    .data(color.domain())
